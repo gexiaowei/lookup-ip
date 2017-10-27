@@ -61,7 +61,7 @@
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
-				<integer>2</integer>
+				<integer>1</integer>
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>keyword</key>
@@ -77,19 +77,19 @@
 				<key>runningsubtext</key>
 				<string>Look uping your ip address</string>
 				<key>script</key>
-				<string>python lookup.py</string>
+				<string>./lookup.py "{query}"</string>
 				<key>scriptargtype</key>
 				<integer>0</integer>
 				<key>scriptfile</key>
 				<string></string>
 				<key>subtext</key>
-				<string></string>
+				<string>Search IP address for '{query}'</string>
 				<key>title</key>
 				<string>Lookup Proxy IP</string>
 				<key>type</key>
 				<integer>0</integer>
 				<key>withspace</key>
-				<false/>
+				<true/>
 			</dict>
 			<key>type</key>
 			<string>alfred.workflow.input.scriptfilter</string>

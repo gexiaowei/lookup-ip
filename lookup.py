@@ -3,61 +3,59 @@
 # Create time @ 2016-03-27 15:03:56
 
 import sys
+import json
 import socket
 from workflow import Workflow, ICON_WEB, web
 
 API = "http://ip-api.com/json"
+TAOBAO_IP_API = 'http://ip.taobao.com/service/getIpInfo2.php'
 
 
 def main(wf):
-    www_ip = get_www_ip()
-    wf.add_item(
-        title=www_ip['ip'],
-        subtitle=www_ip['timezone'],
-        arg=www_ip['ip'],
-        valid=True,
-        icon=ICON_WEB)
-
-    lan_ip = get_lan_ip()
-    wf.add_item(
-        title=lan_ip,
-        subtitle=lan_ip,
-        arg=lan_ip,
-        valid=True,
-        icon=ICON_WEB)
-
+    args = wf.args
+    if not args[0]:
+        add_www_ip(wf)
+        add_lan_ip(wf)
+    else:
+        add_www_ip(wf, ip=args[0])
     wf.send_feedback()
 
 
-def get_www_ip():
-    data = web.get(API).json()
-    if data['status'] == 'success':
-        return {
-            "ip": data['query'],
-            "timezone": data['timezone']
-        }
+def add_www_ip(wf, ip='myip'):
+    response = web.post(TAOBAO_IP_API, params={'ip': ip}).json()
+    data = response['data']
+    if response['code'] == 0:
+        wf.add_item(
+            title=data['ip'],
+            subtitle=u'{} {} {}'.format(data['country'], data['city'],
+                                        data['isp']),
+            arg=data['ip'],
+            valid=True,
+            icon=ICON_WEB)
     else:
-        return {
-            "ip": "unknown address",
-        }
+        wf.add_item(
+            title='unknown address', subtitle='WWW IP Address', icon=ICON_WEB)
 
 
-def get_lan_ip():
+def add_lan_ip(wf):
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
         ip = s.getsockname()[0]
+        wf.add_item(
+            title=ip,
+            subtitle="Lan IP Address",
+            arg=ip,
+            valid=True,
+            icon=ICON_WEB)
     except:
-        ip = "unknown address"
+        wf.add_item(
+            title='unknown address', subtitle='Lan IP Address', icon=ICON_WEB)
     finally:
         s.close()
-    return ip
 
 
 if __name__ == '__main__':
-    # Create a global `Workflow` object
     wf = Workflow()
-    # Call your entry function via `Workflow.run()` to enable its helper
-    # functions, like exception catching, ARGV normalization, magic
-    # arguments etc.
     sys.exit(wf.run(main))
+    # get_www_ip()
